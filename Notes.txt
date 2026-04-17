@@ -1,0 +1,27 @@
+Basic features to include:
+1. Authentication 
+APIs
+   => register : 1. user ka data save karto 2. then token user ko create krke dedo
+   => Login
+   => Logout (Token Blacklisting)
+
+2. Post
+   => Create
+   => Can see the Post
+   => Like Posts (unmounted)
+   => Save Posts 
+
+3. Users
+   => Followers
+   => Following
+
+First well create Backend
+1. npm i express : to create server 
+2. npm i mongoose : to connect server and database
+
+User schema will have :-
+username , email, password, Bio, Followers: Array, ProfilePick
+
+
+
+
