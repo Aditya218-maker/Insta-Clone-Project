@@ -11,9 +11,11 @@ middleware lagate ho (express.json())
 
 const express = require('express')
 
-const cookieParser = require("cookie-parser")
+const cookieParser = require('cookie-parser')
 
-const authRouter = require("./Routes/auth.routes")
+const authRouter = require('./Routes/auth.routes')
+
+const PostRouter = require('./Routes/post.routes')
 
 /**
  * require("express")
@@ -28,10 +30,15 @@ app.get / app.post
 
 const app = express()
 
-app.use(express.json());
+app.use(express.json()) // ye middleware raw format data ko padh skta h form-data format data ko nhi 
+
+// we need a different middleware so that express server can read form-data : install multer
+// npm i multer
 
 app.use(cookieParser())
 
-app.use("/api/auth", authRouter)
+app.use('/api/auth', authRouter)
+
+app.use('/api/posts', PostRouter)
 
 module.exports = app

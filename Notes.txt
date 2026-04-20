@@ -5,8 +5,10 @@ APIs
    => Login
    => Logout (Token Blacklisting)
 
-2. Post
+2. Post: caption, Image url, UserCreated_Id, Created at : Date time
+create a model for thi in post.model.js
    => Create
+
    => Can see the Post
    => Like Posts (unmounted)
    => Save Posts 
@@ -21,6 +23,8 @@ First well create Backend
 
 User schema will have :-
 username , email, password, Bio, Followers: Array, ProfilePick
+
+
 
 
 

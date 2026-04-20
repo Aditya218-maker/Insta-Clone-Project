@@ -3,14 +3,14 @@
  * Just paste the function from auth.route.js here remove the callback and give ita a name
  */
 
-const UserModel = require("../Models/user.model");
+const UserModel = require('../Models/user.model');
 
-const crypto = require("crypto");
+// we can use crypto but its a low level package. In future if we want advance security we want bcrypt
+const bcrypt = require('bcryptjs');
 
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-
-async function RegisterController(req, res) {
+async function RegisterController (req, res) {
   /*
     
 UserModel kya hai?
@@ -97,7 +97,7 @@ UserModel = object (model)
     
     */
 
-  const { email, username, password, bio, profileImage } = req.body;
+  const { email, username, password, bio, profileImage } = req.body
 
   /* 
 Iska matlab:   req.body ke andar jo data aaya hai, usko alag-alag variables me nikaal lo
@@ -139,13 +139,13 @@ Kyu use karte hain?
 */
 
   const UserExists = await UserModel.findOne({
-    $or: [{ username }, { email }],
+    $or: [{ username }, { email }]
 
     // iska matlab ye hua ki database me query karo $or k basis pe ki agar DB me username ya email k basis pe user exist krta h toh result return krdena
     // ye $or oprator ek array maangta hsi jisme conditions hote hai
     // yha pe conditions hai : {username}, {email}
     // ki ya toh username ya email k basis pe result return krdo
-  });
+  })
 
   if (UserExists) {
     return res.status(409).json({
@@ -153,12 +153,15 @@ Kyu use karte hain?
       // + lagake ye condition likho
 
       message:
-        "User already exists with this " +
-        (UserExists.email == email ? "email" : "username"),
-    });
+        'User already exists with this ' +
+        (UserExists.email == email ? 'email' : 'username')
+    })
   }
 
-  const hash = crypto.createHash("sha256").update(password).digest("hex");
+  // const hash = crypto.createHash("sha256").update(password).digest("hex");
+  // Now we dont need this line after using bcrypt. Just write this
+
+  const hash = await bcrypt.hash(password, 10) // => this 10 param is called salt means kitni baar hashing karni hai (10 baar)
 
   /**
  1. crypto.createHash('sha256') 👉 SHA-256 algorithm start karta hai (hashing ke liye)
@@ -184,16 +187,16 @@ Login time kya hota hai?:-
     email,
     bio,
     profileImage,
-    password: hash,
-  }); //yha: Tum database ko bata rahe ho ki kya save karna hai
+    password: hash
+  }) //yha: Tum database ko bata rahe ho ki kya save karna hai
 
   const token = jwt.sign(
     {
-      id: user._id,
+      id: user._id
     },
     process.env.JWT_SECRET,
-    { expiresIn: "1d" },
-  );
+    { expiresIn: '1d' }
+  )
 
   /**
      * token me hamare paas user ka data rehta hai
@@ -207,7 +210,7 @@ Login time kya hota hai?:-
      👉 Iska kaam:  token ko secure banana and verify karna (fake na ho)
      */
 
-  res.cookie("token", token);
+  res.cookie('token', token)
 
   /*res.cookie("token", token)
  ❓ Ye kya karta hai?
@@ -240,20 +243,18 @@ token ✅
  */
 
   res.status(201).json({
-    message: "User Registered Successfully",
+    message: 'User Registered Successfully',
     user: {
       email: user.email,
       username: user.username,
       bio: user.bio,
-      profileImage: user.profileImage,
-    },
-  });
+      profileImage: user.profileImage
+    }
+  })
 }
 
-
-
-async function LoginController(req, res){
-  const { username, email, password } = req.body;
+async function LoginController (req, res) {
+  const { username, email, password } = req.body
 
   /**
    * hamara user ya toh username aur passsword ya fir email aur password k through login krrha hoga
@@ -262,8 +263,8 @@ async function LoginController(req, res){
   // at least one field required
   if ((!username && !email) || !password) {
     return res.status(400).json({
-      message: "Username or email and password are required",
-    });
+      message: 'Username or email and password are required'
+    })
   }
 
   const user = await UserModel.findOne({
@@ -274,49 +275,56 @@ async function LoginController(req, res){
       jayega aur wo wli condition false ho jayega aur dusri condition k basis pe user find krega
 */
       {
-        username: username, //user username derha tph username k basis pe find one karo
+        username: username //user username derha tph username k basis pe find one karo
       },
       {
-        email: email,
-      },
-    ],
-  });
+        email: email
+      }
+    ]
+  })
   if (!user) {
     return res.status(404).json({
-      message: "User not found",
-    });
+      message: 'User not found'
+    })
   }
-  
-  const hash = crypto.createHash('sha256').update(password).digest('hex')
 
-  const isPasswordValid = hash == user.password
+  // const hash = crypto.createHash('sha256').update(password).digest('hex')
+  // const isPasswordValid = hash == user.password
 
-  if(!isPasswordValid){
+  // Now we dont want this long need after using bcrypt we can do this in one line
+
+  const isPasswordValid = await bcrypt.compare(password, user.password)
+  /* this line alone do two things 1. login k tym jo password aya h use hash me ocnvert karo
+                                   2. Compare karo current passowrd se 
+*/
+
+  if (!isPasswordValid) {
     return res.status(401).json({
-      message : "Wrong password"
+      message: 'Wrong password'
     })
   }
 
-    const token = jwt.sign(
-      { 
-        id : user._id 
-      }, process.env.JWT_SECRET, { expiresIn: "1d" }
-    )
-    res.cookie( "token", token )
+  const token = jwt.sign(
+    {
+      id: user._id
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  )
+  res.cookie('token', token)
 
-    res.status(200).json({
-      message : "User logged in successfully",
-      user :{
-        username : user.username,
-        email : user.email,
-        bio : user.bio,
-        profileImage : user.profileImage
-      }
-    })
-
-};
+  res.status(200).json({
+    message: 'User logged in successfully',
+    user: {
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      profileImage: user.profileImage
+    }
+  })
+}
 
 module.exports = {
-    RegisterController,
-    LoginController
+  RegisterController,
+  LoginController
 }
