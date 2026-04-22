@@ -209,9 +209,67 @@ async function GetPostController(req, res) {
     })
 }
 
+async function GetPostDetailsController(req, res){
+    const token = req.cookies.token
+
+    //agr token nahi mila toh 
+    if(!token){
+        res.status.json({
+            message: "Unauthorized access"
+        })
+    }
+//agr token milgya toh verify kar
+    let decoded;
+    try{
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
+    }
+    catch{
+        return res.stauts.json({
+            message : " Invalid token"
+        })
+    }
+    const userId = decoded.id
+
+    //ek particular post ki id bhi cahiye api me daalne k liye bhi
+    const postId = req.params.postId
+
+    const post = await PostModel.findById(postId)
+
+    //agar psot hi nahi milti
+    if(!post){
+        return res.status(404).json({
+            message: "Post not found"
+        })
+    }
+
+    //check kr jo user request bhej rha hai usi ne post create kri thi ya nahi?
+    //* * lekin JS me do object id normal id ki tarh compare nahi hoti...
+    // const isValiduser = post.user === userId     => GALAT TAREEKA
+
+
+    //unke liye alag methods use krna padta hai jaise .equals method()
+    // ya fir object id ko .toString laga k string me convert krlo aur fir compare karlo
+    // aur userid kyuki decoded me save thi toh wo already string me hi hoti hai 
+    const isValiduser = post.user.toString() === userId    //=> SAHI TAREEKA
+    
+
+    if(!isValiduser){
+        return res.status(403).json({
+            message: "Invalid User"
+        })
+    }
+
+    return res.status(200).json({
+        messgae: "Posts fetched successfully",
+        post
+    })
+
+}
+
 
 module.exports = {
     CreatePostController,
-    GetPostController
+    GetPostController,
+    GetPostDetailsController
 }
 

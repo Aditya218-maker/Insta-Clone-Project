@@ -51,9 +51,17 @@ PostRouter.post("/", upload.single("image"), PostController.CreatePostController
 
 
 /**
- * Get API:  /api/posts/      => protected
+ * Get all posts API:  /api/posts/      => protected
  */
 
 PostRouter.get("/", PostController.GetPostController)
+
+/**
+ * return detail about specific post with the id. Also check whether posts belongs to the user who requested
+ * /api/posts/details/:postid
+ */
+
+PostRouter.get("/details/:postId", PostController.GetPostDetailsController)
+
 
 module.exports = PostRouter
