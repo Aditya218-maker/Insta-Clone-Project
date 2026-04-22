@@ -49,4 +49,11 @@ req.body = { caption, imageprofile }
 
 PostRouter.post("/", upload.single("image"), PostController.CreatePostController)
 
+
+/**
+ * Get API:  /api/posts/      => protected
+ */
+
+PostRouter.get("/", PostController.GetPostController)
+
 module.exports = PostRouter

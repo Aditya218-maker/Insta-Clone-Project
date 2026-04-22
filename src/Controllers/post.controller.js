@@ -163,10 +163,55 @@ async function CreatePostController(req, res) {
 // ab multiple user same api pe req bhejenge lekin server ko kaise paat chalega ki kon konsa request krrha hai 
 // usi k liye hamare paas Token rehta hai
 
+async function GetPostController(req, res) {
+/**
+ * Cookie ek chhota data hota hai jo browser me store hota hai.
+ * Browser kuch aisa save karta hai: token = "eyJhbGciOiJIUzI1NiIsInR5cCI..."
+ * Ye browser automatically har request ke saath server ko bhej sakta hai.
+ * 
+ * Token server banata hai jab user login karta hai.
+ * 
+ * Server cookie me token save karta hai: res.cookie("token", token)
+ * "token" = cookie ka naam; token = JWT value
+ * 
+ * Server browser ko cookie bhejta hai : res.cookie("token", token)
+ * cookie browser/client side me save hoti hai
+ * User next request bhejta hai. Browser automatically cookie bhejta hai
+ * Tab server ko milta hai: req.cookies.token
+ * 
+ * Server token decode karta hai: decoded = jwt.verify(token, process.env.JWT_SECRET)
+ */
 
+
+
+    const token = req.cookies.token //taaki ham token ka data pata kar sake ki data kis user ka hai jisse pata chalega request kis user ne kia hai
+    //so we will use a method jwt.verify which needs two params token and jwt secret
+    let decoded;
+    try{
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
+    } 
+    catch(err){
+        return res.status(401).json({
+            message: "Token invalid "
+        })
+    }
+
+    const userId = decoded.id //jo bhi user ne req bhji hogi us user ki id aa jayegi
+
+    //find and return all posts created by the user having this userid
+    const posts = await PostModel.find({
+        user: userId
+    })
+    // aur response bhj do
+    res.status(200).json({
+        message: "Posts fetched",
+        posts
+    })
+}
 
 
 module.exports = {
-    CreatePostController
+    CreatePostController,
+    GetPostController
 }
 
