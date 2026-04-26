@@ -25,3 +25,68 @@ User schema will have :-
 username , email, password, Bio, Followers: Array, ProfilePick
 
 
+
+
+
+
+
+
+
+
+
+
+
+suppose hame ek feature create karma hai jisme koi b user kisi ko bhi follow kr skta hai 
+Tumhara feature: Ek user dusre user ko follow kar sakta hai
+
+Example:
+
+A follows B
+A follows C
+D follows A
+
+Ab hame store karna hai: A kisko follow karta hai aur A ko kaun follow karta hai
+Ek user multiple users ko follow kar sakta hai
+
+To kyunki: ✅ ek user → multiple users
+
+isliye structure hona chahiye:  one-to-many relationship
+
+iska pehla aproach hai user.model.js me jaake do arrya create krle followers aur Following
+
+MongoDB me multiple values rakhne ke liye: ✅ array use karte hain
+
+Followers : [{
+   type: mongoose.Schema.Types.ObjectId,
+   ref: "users"
+}],
+Following : [{
+   type: mongoose.Schema.Types.ObjectId,
+   ref: "users"
+}]
+
+ObjectId kyun? Hum poora user object store nahi karte.
+Instead: sirf user ka _id store karte hain
+
+ref: "users" : Taaki mongoose ko pata chale: Ye ids users collection ki hain
+Phir populate use kar sakte ho.
+
+** 
+Lekin agar 275m followers hue toh follwers array me 275m ids hone chaiye 
+maan lo ek id ki 12 bytes storage hai toh 275m ki storage : 3.2gb ho jaegi
+
+But MongoDB has 16MB document limit toh system fail ho jaega thus we have to use another approach 
+
+ISKA solution hai edge collection;
+
+
+
+Mongo atlas me jaao user collection me ek user ke data ko ham Document bolte hain
+
+ab hamare pass do document hai user a aur useer b ka diagram k hissab se edge collection do doucment ke beech me 
+followers aur followee ka relation batati hai aur unhe ham edge collection bolte hai 
+
+uske liye hame models me ek alag se file banani padegi follow.model.js
+
+
+// Code kabhi yaad nahi rkhna hota hai tumhe bas flow yaad rakhna hai ki kis feature k baad kya karna hai
