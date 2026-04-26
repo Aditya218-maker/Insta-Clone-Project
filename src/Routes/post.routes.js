@@ -1,6 +1,31 @@
 const express = require("express")
+/**
+ * iska matlab hai: ➡ tum express package ko import kar rahe ho taaki us file ke andar uske methods use kar sako.
+ * Kyuki routes file me tumhe chahiye: express.Router()
+ */
  
 const PostRouter = express.Router()
+
+/***
+ * const router = express.Router()
+ * 
+iska matlab:
+express ek module/object hai
+us object ke andar ek method hai: Router()
+ye method ek naya router object create karta hai
+
+Router object kya hota hai?
+
+Uske paas methods hote hain:
+router.get()
+router.post()
+router.put()
+router.delete()
+
+
+ */
+const IdentifyUser = require('../middlewares/auth.middleware')
+
 const PostController = require('../Controllers/post.controller')
 
 const multer = require("multer")
@@ -47,21 +72,22 @@ API : /api/posts => protected means only users having token can access this api
 req.body = { caption, imageprofile }
 */
 
-PostRouter.post("/", upload.single("image"), PostController.CreatePostController)
+PostRouter.post("/", upload.single("image"), IdentifyUser, PostController.CreatePostController)
 
 
 /**
  * Get all posts API:  /api/posts/      => protected
  */
 
-PostRouter.get("/", PostController.GetPostController)
+PostRouter.get("/", IdentifyUser, PostController.GetPostController)
+
 
 /**
  * return detail about specific post with the id. Also check whether posts belongs to the user who requested
  * /api/posts/details/:postid
  */
 
-PostRouter.get("/details/:postId", PostController.GetPostDetailsController)
+PostRouter.get("/details/:postId",IdentifyUser, PostController.GetPostDetailsController)
 
 
 module.exports = PostRouter

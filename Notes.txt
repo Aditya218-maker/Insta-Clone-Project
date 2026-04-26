@@ -24,3 +24,4 @@ First well create Backend
 User schema will have :-
 username , email, password, Bio, Followers: Array, ProfilePick
 
+

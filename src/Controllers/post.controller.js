@@ -30,27 +30,27 @@ const imagekit = new ImageKit({
 async function CreatePostController(req, res) {
     console.log(req.body, req.file);
 
-    const token = req.cookies.token
-    //agar kisi user k pass token nahi h toh : ya toh uska token expire ho chuka hai(login nahi kiya) ya fir usne abhi tak register nahi kiay hai
+    // const token = req.cookies.token
+    // //agar kisi user k pass token nahi h toh : ya toh uska token expire ho chuka hai(login nahi kiya) ya fir usne abhi tak register nahi kiay hai
 
-    if (!token) {
-        return res.status(401).json({
-            message: "Token not provided, Unauthorized access"
-        })
-    }
+    // if (!token) {
+    //     return res.status(401).json({
+    //         message: "Token not provided, Unauthorized access"
+    //     })
+    // }
 
-    let decoded = null //const blocked scope hota hai isliye decoded ko bahar hi declare krdo taaki baad me b use kr sko
+    // let decoded = null //const blocked scope hota hai isliye decoded ko bahar hi declare krdo taaki baad me b use kr sko
 
-    try{
-        decoded = jwt.verify(token, process.env.JWT_SECRET)
-        // is line se ham token ka data toh pdh hi rhe hote hai saath me verify b krrhe hote hai ki token sahi h ya nhi
-        // agra token shi h toh data nikal k decoded ko dedegi warna token galat h toh ye verify method ek error throw kregi jise ham catch me handle krenge
-        // agar try aur catch ka use nhi krenge aur token galat hua toh ye method 500 error bhejega aur ham 401 error chahte hai
-    } catch(err){
-        return res.status(401).json({
-            message: " user not authorized"
-        })
-    }
+    // try{
+    //     decoded = jwt.verify(token, process.env.JWT_SECRET)
+    //     // is line se ham token ka data toh pdh hi rhe hote hai saath me verify b krrhe hote hai ki token sahi h ya nhi
+    //     // agra token shi h toh data nikal k decoded ko dedegi warna token galat h toh ye verify method ek error throw kregi jise ham catch me handle krenge
+    //     // agar try aur catch ka use nhi krenge aur token galat hua toh ye method 500 error bhejega aur ham 401 error chahte hai
+    // } catch(err){
+    //     return res.status(401).json({
+    //         message: " user not authorized"
+    //     })
+    // }
 
     //agr token milta hai toh jhame token se data nikalna padega
     //decoded me wo data ayega jo hamne token create krte waqt use kiya tha auth.controller me 
@@ -149,7 +149,7 @@ async function CreatePostController(req, res) {
     const post = await PostModel.create({
         caption: req.body.caption,
         imgUrl: file.url,
-        user: decoded.id
+        user: req.user.id
     })
     res.status(201).json({
         message: "Post created Successfully",
@@ -184,19 +184,19 @@ async function GetPostController(req, res) {
 
 
 
-    const token = req.cookies.token //taaki ham token ka data pata kar sake ki data kis user ka hai jisse pata chalega request kis user ne kia hai
-    //so we will use a method jwt.verify which needs two params token and jwt secret
-    let decoded;
-    try{
-        decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } 
-    catch(err){
-        return res.status(401).json({
-            message: "Token invalid "
-        })
-    }
+    // const token = req.cookies.token //taaki ham token ka data pata kar sake ki data kis user ka hai jisse pata chalega request kis user ne kia hai
+    // //so we will use a method jwt.verify which needs two params token and jwt secret
+    // let decoded;
+    // try{
+    //     decoded = jwt.verify(token, process.env.JWT_SECRET)
+    // } 
+    // catch(err){
+    //     return res.status(401).json({
+    //         message: "Token invalid "
+    //     })
+    // }
 
-    const userId = decoded.id //jo bhi user ne req bhji hogi us user ki id aa jayegi
+    const userId = req.user.id //jo bhi user ne req bhji hogi us user ki id aa jayegi
 
     //find and return all posts created by the user having this userid
     const posts = await PostModel.find({
@@ -210,25 +210,25 @@ async function GetPostController(req, res) {
 }
 
 async function GetPostDetailsController(req, res){
-    const token = req.cookies.token
+//     const token = req.cookies.token
 
-    //agr token nahi mila toh 
-    if(!token){
-        res.status.json({
-            message: "Unauthorized access"
-        })
-    }
-//agr token milgya toh verify kar
-    let decoded;
-    try{
-        decoded = jwt.verify(token, process.env.JWT_SECRET)
-    }
-    catch{
-        return res.stauts.json({
-            message : " Invalid token"
-        })
-    }
-    const userId = decoded.id
+//     //agr token nahi mila toh 
+//     if(!token){
+//         res.status.json({
+//             message: "Unauthorized access"
+//         })
+//     }
+// //agr token milgya toh verify kar
+//     let decoded;
+//     try{
+//         decoded = jwt.verify(token, process.env.JWT_SECRET)
+//     }
+//     catch{
+//         return res.stauts.json({
+//             message : " Invalid token"
+//         })
+//     }
+    const userId = req.user.id
 
     //ek particular post ki id bhi cahiye api me daalne k liye bhi
     const postId = req.params.postId
@@ -265,6 +265,48 @@ async function GetPostDetailsController(req, res){
     })
 
 }
+// abhi tak teeno controller me hamne token se token se data nikalwaya h baar baar => lekin scalable code me we should avoid repetition
+// to avoid this we use a middleware 
+// bade projects me boht saare routers hote hai 
+// man lo user server ko re bhjta hai aur server post router ko req forward karta hai 
+// postrouter k paas 3 apis hain post api, get posts api, get ost details api
+
+/*
+//CONCEPTS:
+
+1. Ek main server hota hai
+Ye Express app hoti hai jo request receive karti hai.
+
+const express = require("express");
+const app = express();
+app.use("/posts", postRouter);
+
+Yahaan:
+app = main server
+server request receive karta hai
+phir request ko appropriate router ko bhej deta hai
+
+2. Router ek mini-module hota hai
+Har feature ka apna router hota hai:
+
+postRouter
+userRouter
+authRouter
+commentRouter
+
+Ye logically alag-alag routes handle karte hain.
+
+3. router module me hi APIs define karte hain
+Router file me hum likhte hain:
+router.get(...)
+router.post(...)
+router.put(...)
+router.delete(...)
+*/
+
+// ab baar ye identification code likhne k bajaye ham iske ek alag folder me likhenge : auth.middleware.js me
+// identification code wo wla h jo if(!token) se leke try aur catch block  aur decoded wli line wla usko yha se hata ke middlewarre file me daalde
+
 
 
 module.exports = {
