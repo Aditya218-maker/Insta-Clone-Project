@@ -13,9 +13,12 @@ const express = require('express')
 
 const cookieParser = require('cookie-parser')
 
+// require Routes
 const authRouter = require('./Routes/auth.routes')
 
 const PostRouter = require('./Routes/post.routes')
+
+const UserRouter = require('./Routes/user.routes')
 
 /**
  * require("express")
@@ -37,8 +40,11 @@ app.use(express.json()) // ye middleware raw format data ko padh skta h form-dat
 
 app.use(cookieParser())
 
+// using Routes
 app.use('/api/auth', authRouter)
 
 app.use('/api/posts', PostRouter)
+
+app.use('/api/users', UserRouter)
 
 module.exports = app
