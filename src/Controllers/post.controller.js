@@ -6,6 +6,10 @@ const { toFile } = require("@imagekit/nodejs")
 
 const jwt = require("jsonwebtoken")
 
+const LikeModel = require('../Models/likes.model')
+
+const FollowModel = require('../Models/follow.model')
+
 /**
  * .env file isliye banate hain taaki secret values (jaise API key, private key) code ke andar na likhni pade.
  * Node.js .env file se values process.env me load karta hai, jisse keys secure aur alag manage hoti hain.
@@ -308,10 +312,36 @@ router.delete(...)
 // identification code wo wla h jo if(!token) se leke try aur catch block  aur decoded wli line wla usko yha se hata ke middlewarre file me daalde
 
 
+async function LikePostController(req, res){
+    const username = req.user.username
+    const postId = req.params.postId
+
+    const post = await PostModel.findById(postId)
+
+    if(!postId){
+        return res.status(400).json({
+            message: "Post not found"
+        })
+    }
+
+    const like = await LikeModel.create({
+        post: postId,
+        user: username
+    })
+
+    res.status(200).json({
+        message: "Post liked successfully",
+        like
+    })
+
+}
+
+
 
 module.exports = {
     CreatePostController,
     GetPostController,
-    GetPostDetailsController
+    GetPostDetailsController,
+    LikePostController,
 }
 

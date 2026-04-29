@@ -90,4 +90,15 @@ PostRouter.get("/", IdentifyUser, PostController.GetPostController)
 PostRouter.get("/details/:postId",IdentifyUser, PostController.GetPostDetailsController)
 
 
+/**
+ * @route POST : /api/posts/like/:postid
+ * @description like a psot with the id provided in the request paarams
+ */
+PostRouter.post("/like/:postid", IdentifyUser, PostController.LikePostController)
+
+
+
+
+
+
 module.exports = PostRouter

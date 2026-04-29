@@ -11,6 +11,18 @@ const UserRouter = express.Router()
  * @description Follow a user
  * @acess Private
  */
-UserRouter.post("/follow/:username", IdentifyUser, UserController.FollowUserController)
+ UserRouter.post("/follow/:username", IdentifyUser, UserController.FollowUserController)
+//remove it because ab dedicated follow route use hoga.
+
+/**
+ * @route POST : /api/users/unfollow/:userid
+ * @description Unfollow a user
+ * @access Private
+ */
+UserRouter.post("/unfollow/:username", IdentifyUser, UserController.UnFollowUserController)
+
+UserRouter.get("/follow/pending", IdentifyUser, UserController.GetPendingRequestsController)
+
+UserRouter.patch("/follow/respond/:requestId", IdentifyUser, UserController.RespondFollowRequestController)
 
 module.exports = UserRouter
