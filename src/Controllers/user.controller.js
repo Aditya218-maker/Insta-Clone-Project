@@ -70,12 +70,22 @@ async function UnFollowUserController(req, res){
 
 async function GetPendingRequestsController(req, res) {
     const username = req.user.username
-
+    // current logged in user nikaalo. Middleware ne user identify kar diya hota hai.
+    /**
+username = "rahul"
+Matlab: Rahul dekh raha hai kisne usko request bheji.
+     */
     const requests = await FollowModel.find({
         Followee: username,
         status: "pending"
     })
-
+/**
+ * database me search
+ * Ye query bolegi:
+Find karo jahan:
+Followee = "rahul"
+status = "pending"
+ */
     res.status(200).json({
         message: "Pending requests fetched",
         requests
@@ -84,7 +94,21 @@ async function GetPendingRequestsController(req, res) {
 
 async function RespondFollowRequestController(req, res) {
     const requestId = req.params.requestId
+    //request ki id lo jo URL se aayegi
     const action = req.body.action
+    /**
+user ka action lo
+const action = req.body.action
+
+Frontend bhejega:
+{
+   "action": "accepted"
+}
+ya
+{
+   "action": "rejected"
+}
+     */
 
     if (!["accepted", "rejected"].includes(action)) {
         return res.status(400).json({
@@ -101,6 +125,12 @@ async function RespondFollowRequestController(req, res) {
             new: true
         }
     )
+    /**
+validation
+Check karega: sirf ye allowed hai:
+✅ accepted
+✅ rejected
+     */
 
     res.status(200).json({
         message: `Request ${action}`,
@@ -113,5 +143,5 @@ module.exports = {
     UnFollowUserController,
     GetPendingRequestsController,
     RespondFollowRequestController,
-    
+
 }
