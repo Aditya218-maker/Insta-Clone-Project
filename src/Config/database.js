@@ -9,13 +9,7 @@ Mongoose kya hota hai?
 *Data ko easy aur structured way me handle karne deta hai
 
 Jaise Express API banane ke liye use hota hai waise hi Mongoose database handle karne ke liye use hota hai
-
-
-
  */
-
-
-
 
 const mongoose = require("mongoose")
 

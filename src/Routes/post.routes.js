@@ -1,104 +1,80 @@
-const express = require("express")
-/**
- * iska matlab hai: ➡ tum express package ko import kar rahe ho taaki us file ke andar uske methods use kar sako.
- * Kyuki routes file me tumhe chahiye: express.Router()
- */
- 
-const PostRouter = express.Router()
+const express = require("express");
 
-/***
- * const router = express.Router()
- * 
-iska matlab:
-express ek module/object hai
-us object ke andar ek method hai: Router()
-ye method ek naya router object create karta hai
-
-Router object kya hota hai?
-
-Uske paas methods hote hain:
-router.get()
-router.post()
-router.put()
-router.delete()
-
-
- */
-const IdentifyUser = require('../middlewares/auth.middleware')
-
-const PostController = require('../Controllers/post.controller')
-
-const multer = require("multer")
-
-const upload = multer ({ storage : multer.memoryStorage() }) // to use it jis bhi api me you expect a file us api me likho upload.single("image") 
-// "image" naam likho mtlb frontend(postman) me jo naam likha wo likhna 
-
-/**
- * Multer uses two types of storage Disk and memory Storage
- * Disk Storage : file ssds ya hard disk me store hogi
- * Memory Storage : stores files in memory as Buffer objects, yaani temprorarily store hogi
- 
- * We'll use Memory Storage. Why?
-* Suppose a user posst an image and yhat image is stored in server 
-Now the user has 2000 followers . Server has to show that image to those 2000 followers
-Imagine the size of the file to be 100kb. So tottal storage cost will be 20 lacs kb or 200 mb data will be spend by the server 
-* That means  server has to use 200 mb bandwidth to serve the img to 2000 users  (Bandwidth means server kitna data share kr rha h ya mangwa rha h)
-* And we'll have to pay money for that 
-
-// Now if we Use cloud Storage provider which do the same thing of transfering img to different users
-// wel have to pay much less
-// Some good Cloud Storrage provider are : S3 by AWS, Image kit, cloudinaryk
-
-// So jaise hi user img server ko dega server use cloud storage provider k paas bhjdega yaani server temporarily store krta hai
-// This is where memory storage comes. It stores file temporarily in multer
-
-
-// To send img to cloud storage we'll use image kit 
-// Read the documentation of imagekit => go to the website imagekit.io => Go to Docs => go to Nodejs => read teh documentation written how can you use imagekit in doc
-
-
-// To install : npm install @imagekit/nodejs
-// Then go To File uploads : Read it even if you dont ubderstand
-
-// Go to Post Cntroller and require image kit
-
-
-
- */
-
+const AuthController = require('../Controllers/auth.controller')
 
 /*
-API : /api/posts => protected means only users having token can access this api
-req.body = { caption, imageprofile }
+* require("express") → tum Express naam ka package (library) apne project 
+me la rahe ho
+
+Kyunki API banane ke liye Express ki zarurat hoti hai
+wrna .post, .get methods kaam nahi krenge
+
+API ek bridge hai jo frontend (UI) aur backend (server/database) ko connect karta hai
+
+APIs banate kyu hain?
+👉 Kyunki:
+*frontend ko data chahiye hota hai
+*database direct access nahi dete
+*API ke through safe tarike se data dete hain
+
+ex:
+app.get("/users", (req, res) => {
+  res.send("User list")
+})
+
+👉 Jab koi /users hit karega → data milega
+👉 Ye ek API hai
+
+Agar API nahi banaye toh?
+👉 Problems:
+frontend data nahi le paayega
+app kaam hi nahi karegi
+sab kuch direct database se karna unsafe hoga
+
+
+📁 auth.route.js
+👉 Ye tumhari API wali file hai
+
+Yaha tum:
+routes banate ho (/register)
+logic likhte ho (user check, save etc.)
+
+👉 Simple words me:
+“Yaha APIs banti hain
+
+Ek important cheez 
+Tumne auth.route.js banaya hai,
+lekin usko app.js me use bhi karna padega 👇
+
+app.js me add karo:
+const authRouter = require("./routes/auth.route")
+app.use("/auth", authRouter)
+
 */
 
-PostRouter.post("/", upload.single("image"), IdentifyUser, PostController.CreatePostController)
+// const UserModel = require("../Models/user.model");
 
+const authRouter = express.Router();
 
-/**
- * Get all posts API:  /api/posts/      => protected
- */
+//express.Router() Express ka hi method hai
+/*
 
-PostRouter.get("/", IdentifyUser, PostController.GetPostController)
+Ye ek mini-app / mini router hota hai
+👉 Iska use hota hai: alag file me APIs banane ke liye
 
+Agar router na use kare => Sab kuch app.js me:
 
-/**
- * return detail about specific post with the id. Also check whether posts belongs to the user who requested
- * /api/posts/details/:postid
- */
+app.post("/register", ...)
+app.post("/login", ...)
+app.get("/profile", ...)
 
-PostRouter.get("/details/:postId",IdentifyUser, PostController.GetPostDetailsController)
+*/
+// const crypto = require("crypto");
 
+// const jwt = require("jsonwebtoken");
 
-/**
- * @route POST : /api/posts/like/:postid
- * @description like a psot with the id provided in the request paarams
- */
-PostRouter.post("/like/:postid", IdentifyUser, PostController.LikePostController)
+authRouter.post("/register", AuthController.RegisterController )
 
+authRouter.post("/login", AuthController.LoginController)
 
-
-
-
-
-module.exports = PostRouter
+module.exports = authRouter;
