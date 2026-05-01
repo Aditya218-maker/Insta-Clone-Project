@@ -1,0 +1,10 @@
+//To use scss youve to install another package : npm i sass
+
+main{
+    min-height: 100vh;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
