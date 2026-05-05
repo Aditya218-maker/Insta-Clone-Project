@@ -93,6 +93,10 @@ uske liye hame models me ek alag se file banani padegi follow.model.js
 
 // Code kabhi yaad nahi rkhna hota hai tumhe bas flow yaad rakhna hai ki kis feature k baad kya karna hai
 
+//Likes count k liye bhi ek alag edge collection hoga
 
 
-Likes count k liye bhi ek alag edge collection hoga
+
+//to use api in Frontend we need to install axios
+
+// install a package in backend cors to handle cross request 

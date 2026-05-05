@@ -11,9 +11,21 @@ middleware lagate ho (express.json())
 
 const express = require('express')
 
-app.use(express.json()) // ye middleware raw format data ko padh skta h form-data format data ko nhi 
-
 const cookieParser = require('cookie-parser')
+
+const cors = require("cors")
+
+const app = express()
+
+app.use(express.json()) 
+
+app.use(cookieParser())
+
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:5173"
+}))
+
 
 // require Routes
 const authRouter = require('./Routes/auth.routes')
@@ -32,15 +44,11 @@ const app = express()
 
 app.get / app.post
 👉 APIs banane ke kaam aata hai
- */
-
-const app = express()
-
+*/
 
 // we need a different middleware so that express server can read form-data : install multer
 // npm i multer
 
-app.use(cookieParser())
 
 // using Routes
 app.use('/api/auth', authRouter)
