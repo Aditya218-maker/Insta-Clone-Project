@@ -1,24 +1,34 @@
-import React, {useState} from 'react'
-import './Styles/Form.scss'
+//is login.jsx ka kaam hai ui dikhana but ye axios ki help se backend communication b handle krrhi hai 
+// But according to React architecture UI layer toh backend se communicate karti hi nahi 
+// toh hame axios wala code hatana padega aur use kisi aur file me likhna padega. Same kaam register.jsx file me b karna hai 
+
+// Toh hame baaki layers develop karni hai is order me API layer->State Layer-> Hooks
+
+import {useState, useContext} from 'react'
+import '../Styles/Form.scss'
 import { Link } from 'react-router'
-import axios from 'axios'
+import { AuthContext } from '../auth.context'
+
 
 
 const Login = () => {
 
-  const [Username, setUsername] = useState("")
-  const [password, setpassword] = useState("")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
-  function handleSubmit(e){
+    const { handleLogin } = useContext(AuthContext)
+
+  async function handleSubmit(e){
     e.preventDefault()
 
-    axios.post("http://127.0.0.1:3000/api/auth/login",{
-      username: Username, password
-    },{withCredentials:true})
-    .then(res=>{
-      console.log(res.data);
+    // axios.post("http://127.0.0.1:3000/api/auth/login",{
+    //   username: Username, password
+    // },{withCredentials:true})
+    // .then(res=>{
+    //   console.log(res.data);
       
-    })
+    // })
+     await handleLogin(username, password)
   }
 
   return (
@@ -33,7 +43,7 @@ const Login = () => {
                 />
 
                 <input 
-                onInput={(e)=>{setpassword(e.target.value)}}
+                onInput={(e)=>{setPassword(e.target.value)}}
                 type="password" name='password' placeholder='Enter password'
                 />
 

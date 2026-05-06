@@ -2,6 +2,8 @@ const express = require("express");
 
 const AuthController = require('../Controllers/auth.controller')
 
+const IdentifyUser = require('../middlewares/auth.middleware')
+
 /*
 * require("express") → tum Express naam ka package (library) apne project 
 me la rahe ho
@@ -76,5 +78,7 @@ app.get("/profile", ...)
 authRouter.post("/register", AuthController.RegisterController )
 
 authRouter.post("/login", AuthController.LoginController)
+
+authRouter.get("/get-me", IdentifyUser, AuthController.GetMeController)
 
 module.exports = authRouter;
