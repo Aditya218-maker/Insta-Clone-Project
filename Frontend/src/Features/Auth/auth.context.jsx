@@ -42,7 +42,7 @@ Matlab: App ke andar jitne bhi components hain, sabko access mil jayega
 
 import { createContext, useEffect, useState } from "react";
 
-import {login, register, getMe} from '../Auth/Services/auth.api'
+import {login, register, getMe} from './Services/auth.api'
 
 export const AuthContext = createContext()
 /*
@@ -67,13 +67,13 @@ Iska kaam: jo bhi components iske andar aayenge unko auth data provide karega
     const [User, setUser] = useState(null)
     const [loading, setloading] = useState(false)
 
-    const handleLogin = async (email, password) => {
+    const handleLogin = async (username, password) => {
 
         //jab bhi user login hoga loading true ho jaega matlab abhi ham user o login karwane ka try krrhe hai
         setloading(true)
 
         try{
-            const response = await login(email,password)
+            const response = await login(username,password)
             setUser(response.user)
         }
         catch(err){
@@ -103,28 +103,3 @@ Iska kaam: jo bhi components iske andar aayenge unko auth data provide karega
 }
 
 
-//Main logic:
-/*
-
-
-1. UI se call aata hai
-Register.jsx: handleRegister(username, email, password)
-
-2. Ye function yaha aata hai
-const handleRegister = async (...) => {
-
-3. Ye API ko call karta hai
-const response = await register(username, email, password)
-
-4. Backend se data aata hai
-
-setUser(response.user)
-👉 User save ho gaya
-
-5. Ab sabko user mil jayega
-Koi bhi component: const { User } = useContext(AuthContext)
-
-#Simple flow: UI → Context → API → Backend
-              Backend → Context → UI
-
-*/

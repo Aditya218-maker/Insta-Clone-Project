@@ -7,7 +7,7 @@
 import {useState, useContext} from 'react'
 import '../Styles/Form.scss'
 import { Link } from 'react-router'
-import { AuthContext } from '../auth.context'
+import {useAuth} from '../Hooks/useAuth'
 
 
 
@@ -16,19 +16,16 @@ const Login = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
-    const { handleLogin } = useContext(AuthContext)
+  const {handleLogin} = useAuth()
+  // use Auth se handle login nikala taaki usko use kr paaye
 
   async function handleSubmit(e){
     e.preventDefault()
 
-    // axios.post("http://127.0.0.1:3000/api/auth/login",{
-    //   username: Username, password
-    // },{withCredentials:true})
-    // .then(res=>{
-    //   console.log(res.data);
-      
-    // })
-     await handleLogin(username, password)
+    handleLogin(username, password)
+    .then(res => {
+      console.log(res);
+    })
   }
 
   return (
@@ -56,3 +53,7 @@ const Login = () => {
 }
 
 export default Login
+
+
+
+//Ui layer sirf Hook se communicate karti hai 
